@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="QBa-bx-XAR">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="dtV-ha-4F0">
+            <objects>
+                <navigationController id="QBa-bx-XAR" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="OwT-MN-3MF">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="NxS-kr-Gsq" kind="relationship" relationship="rootViewController" id="9HR-bo-Rj0"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aWp-au-xel" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-582" y="13"/>
+        </scene>
+        <!--TravelLocationViewController-->
+        <scene sceneID="sui-He-izi">
+            <objects>
+                <viewController storyboardIdentifier="TravelLocationsViewController" id="NxS-kr-Gsq" userLabel="TravelLocationViewController" customClass="TravelLocationsViewController" customModule="VirtualTourist" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="EDu-Oy-saI"/>
+                        <viewControllerLayoutGuide type="bottom" id="Tiq-9Y-a52"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="zo9-32-u36">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" showsCompass="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zEI-dl-JWT">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </mapView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="zEI-dl-JWT" firstAttribute="top" secondItem="zo9-32-u36" secondAttribute="top" id="BOO-7P-srR"/>
+                            <constraint firstItem="zEI-dl-JWT" firstAttribute="leading" secondItem="zo9-32-u36" secondAttribute="leading" id="FKK-mb-jF1"/>
+                            <constraint firstItem="Tiq-9Y-a52" firstAttribute="top" secondItem="zEI-dl-JWT" secondAttribute="bottom" id="hcE-nz-ejq"/>
+                            <constraint firstAttribute="trailing" secondItem="zEI-dl-JWT" secondAttribute="trailing" id="z33-6U-yGg"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="mus-gC-Lg1">
+                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="lxP-go-X7h">
+                            <connections>
+                                <action selector="editLocationPin:" destination="NxS-kr-Gsq" id="JVr-ap-35B"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="mapView" destination="zEI-dl-JWT" id="Bns-An-iqZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="B0y-cf-GK5" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="316" y="12"/>
+        </scene>
+    </scenes>
+</document>
