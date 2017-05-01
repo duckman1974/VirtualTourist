@@ -14,6 +14,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
+    var sharedSession = URLSession.shared
+    var requestToken: String? = nil
+    var session: String? = nil
+    var userID: String? = nil
+    
+    
    static let stack = CoreDataStack(modelName: "Model")!
     //let stack = CoreDataStack(modelName: "Model")!
 
