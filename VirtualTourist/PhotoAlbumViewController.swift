@@ -43,16 +43,17 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         
         mapViewPC.addAnnotation(annotation)
         mapViewPC.setRegion(region, animated: true)
-        self.mapViewPC.camera.altitude = 10000
-        fetchedResultsController?.delegate = self
+        self.mapViewPC.camera.altitude = 50000
         
-
-        do {
-            print("retrieving from coredata")
-            try fetchedResultsController?.performFetch()
-        } catch {}
+        
+        if pin.photo.isEmpty {
+            print("downloading new photos")
+            photosDownload()
+            
+        } else {
+            self.newCollection.isHidden = false
+        }
     }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,14 +66,14 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         photoCollection.allowsMultipleSelection = true
         newCollection.isHidden = false
         removePhotos.isHidden = true
+        fetchedResultsController?.delegate = self
         
-        if pin.photo.isEmpty {
-            print("downloading new photos")
-            photosDownload()
-        }
+        do {
+            print("retrieving from coredata")
+            try fetchedResultsController?.performFetch()
+        } catch {}
         
         setupCollectionFlowLayout()
-        
     }
     
     lazy var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>? = {
@@ -97,20 +98,15 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
                 } else {
                     
                     if let photos = photoArray{
-                        //print(photos)
-                        
-                        //parse photos
+        
                         DispatchQueue.main.async {
                         _ = photos.map() {(dictionary: [String:AnyObject]) -> Photo in
                             let photo = Photo(dictionary: dictionary, context: AppDelegate.stack.context)
                             photo.pin = self.pin
                             AppDelegate.stack.save()
-                            //print(photo)
                             return photo
                             }
-                            
                         }
-                        
                     } else {
                         self.errorAlert(errorString: "An error occurred when fetching photos")
                     }
@@ -130,7 +126,6 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
     }
     
     @IBAction func dismissController(_ sender: Any) {
-       //will need to drop data from here
         let removePhotos = [Photo]()
         
         for photo in removePhotos {
@@ -139,7 +134,6 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         AppDelegate.stack.save()
         
         dismiss(animated: false, completion: nil)
-        
     }
     
     @IBAction func getNewPhotos(_ sender: Any) {
@@ -147,7 +141,6 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         
         for photos in oldPhotos {
             AppDelegate.stack.context.delete(photos)
-            //print("deleting photos")
         }
         photosDownload()
         AppDelegate.stack.save()
@@ -161,7 +154,6 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         })
         
         for index in result {
-            //print(index)
             removePhotos.append(fetchedResultsController?.object(at: index as IndexPath) as! Photo)
         }
         
@@ -173,53 +165,49 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
 
         self.removePhotos.isHidden = true
         self.newCollection.isHidden = false
-        
     }
     
-    
-    
-    // tell the collection view how many cells to make
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        //print(pin.photo.count)
         return pin.photo.count
     }
     
-   // make a cell for each cell index path
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! CollectionViewCell
         configureCell(cell, atIndexPath: indexPath)
-        
+        cell.layer.borderWidth = 0.0
+        cell.layer.borderColor = UIColor.clear.cgColor
         return cell
     }
     
     func configureCell(_ cell: CollectionViewCell, atIndexPath indexPath: IndexPath) {
         
-        var photoImage = UIImage(named: "placeHolder.png")
+        var photoImage = UIImage(named: "placeHolder")
         let photo = fetchedResultsController?.object(at: indexPath) as! Photo
         
         if photo.stringURL == nil || photo.stringURL == "" {
-            photoImage = UIImage(named: "placeHolder.png")
+            photoImage = UIImage(named: "placeHolder")
             
         } else if photo.photo != nil {
             photoImage = UIImage(data: photo.photo! as Data)
 
         } else {
             
-            cell.statusWheel.startAnimating()
+            DispatchQueue.main.async {
+                cell.statusWheel.isHidden = false
+                cell.statusWheel.startAnimating()
+            }
             
             _ = Networking.sharedInstance().imageData(photo.stringURL!) { (imageData, error) in
                 
                 if error != nil {
-                    photoImage = UIImage(named: "placeHolder.png")
-                    //cell.statusWheel.startAnimating()
-                    //DispatchQueue.main.async {
+                    photoImage = UIImage(named: "placeHolder")
+                    DispatchQueue.main.async {
                         cell.photoImage.image = photoImage
-                    //}
+                    }
                 }
                 if let data = imageData {
 
                     photoImage = UIImage(data: data as Data)!
-                    photo.photo = data as Data
                     AppDelegate.stack.save()
                     
                     DispatchQueue.main.async {
@@ -227,15 +215,11 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
                         cell.statusWheel.isHidden = true
                         cell.photoImage.image = photoImage
                     }
-                    
                 }
             }
         }
         cell.photoImage.image = photoImage
     }
-    
-    
-    // MARK: - UICollectionViewDelegate protocol
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         removePhotos.isHidden = false
@@ -262,7 +246,6 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         photoCollection.reloadData()
-        
     }
   
     
@@ -287,7 +270,6 @@ extension PhotoAlbumViewController {
         alertController.addAction(UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.default, handler: nil))
         self.present(alertController, animated: true, completion: nil)
     }
-    
 }
 
 

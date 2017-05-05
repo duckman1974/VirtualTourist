@@ -64,7 +64,6 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         return fetchedResultsController
     }()
     
-    
     func fetchPins() {
         
         if let fc = fetchedResultsController {
@@ -78,9 +77,7 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
             mapView.addAnnotation(Pin as! MKAnnotation)
         }
     }
-    
-    
-    
+
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         
         UserDefaults.standard.set(mapView.region.span.latitudeDelta, forKey: mapLatSpan)
@@ -91,7 +88,6 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         setMap()
     }
     
-     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: Constants.Pin.pin)
@@ -117,13 +113,12 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         }
     }
     
-    func mapSet() -> MKCoordinateRegion {
+    @discardableResult func mapSet() -> MKCoordinateRegion {
         
         let span = MKCoordinateSpanMake(latitudeSpan, longitudeSpan)
         let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         let region = MKCoordinateRegionMake(location, span)
         mapView.setRegion(region, animated: false)
-        //print(region)
         return region
     }
     
@@ -138,7 +133,6 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         
         let mapLocation = gestureRecognizer.location(in: mapView)
         let convertedLocation = mapView.convert(mapLocation, toCoordinateFrom: mapView)
-        print(convertedLocation)
         
         if UIGestureRecognizerState.began == gestureRecognizer.state {
             let pin = Pin(pinLatitude: convertedLocation.latitude, pinLongitude: convertedLocation.longitude, context: AppDelegate.stack.context)
@@ -164,20 +158,16 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
             Constants.PhotoPins.longitude = longitude
             let controller = storyboard?.instantiateViewController(withIdentifier: "PhotoCollection") as! PhotoAlbumViewController
             
-            
             let pin = view.annotation as! Pin
-            //print(pin)
             controller.pin = pin
             controller.bbox = bboxString()
-            //print("this is the map bbox = \(controller.bbox)")
             controller.setAnnotation(annotation: view.annotation!)
             controller.setRegion(region: mapSet())
-            AppDelegate.stack.save() //Added this save- check if there is a problem with this
+            AppDelegate.stack.save()
             present(controller, animated: true, completion: nil)
         }
         mapView.deselectAnnotation(mapView.annotations as? MKAnnotation, animated: true)
     }
-    
     
     @IBAction func editLocationPin(_ sender: Any) {
        
@@ -186,7 +176,6 @@ class TravelLocationsViewController: UIViewController, MKMapViewDelegate, NSFetc
         }
     }
     
-   
     func editPin() {
         if edit == false {
             removePinToolBar.isHidden = false
@@ -230,20 +219,10 @@ extension TravelLocationsViewController {
         
         if latitude == Double(Constants.PhotoPins.latitude), longitude == Double(Constants.PhotoPins.longitude) {
             
-            //print("if lat = \(latitude)")
-            //print("if long = \(longitude)")
-            
             let minLat = max(Constants.PhotoPins.latitude - Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.0)
-            //print("MinLat = \(minLat)")
-            
             let minLong = max(Constants.PhotoPins.longitude - Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.0)
-            //print("MinLong = \(minLong)")
-            
             let maxLat = min(Constants.PhotoPins.latitude + Constants.Flickr.SearchBBoxHalfHeight, Constants.Flickr.SearchLatRange.1)
-            //print(maxLat)
-            
             let maxLong = min(Constants.PhotoPins.longitude + Constants.Flickr.SearchBBoxHalfWidth, Constants.Flickr.SearchLonRange.1)
-            //print(maxLong)
             
             return "\(minLong),\(minLat),\(maxLong),\(maxLat)"
             

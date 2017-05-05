@@ -29,13 +29,5 @@ public class Reachability {
     }
 }
 
-// Use below code to check network connectivity anywhere in project
-/*
-if Reachability.isConnectedToNetwork() == true {
-    print("Internet connection OK")
-} else {
-    print("Internet connection FAILED")
-}
-*/
 
 

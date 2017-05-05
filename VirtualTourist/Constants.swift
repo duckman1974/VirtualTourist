@@ -28,7 +28,7 @@ struct Constants {
     // MARK: Flickr
     struct Flickr {
         static let BaseURL = "https://api.flickr.com/services/rest/"
-        static let Method = "flickr.photos.search"     //"flickr.photos.getRecent"
+        static let Method = "flickr.photos.search"
         
         static let SearchBBoxHalfWidth = 1.0
         static let SearchBBoxHalfHeight = 1.0

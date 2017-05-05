@@ -88,9 +88,7 @@ class Networking: NSObject {
                 completionHandlerForData(false, [], error as? String)
                 return
             }
-            
-            //print(parsedResult)
-            
+           
             guard let stat = parsedResult[Constants.FlickrResponseKeys.Status] as? String, stat == Constants.FlickrResponseValues.OKStatus else {
                 completionHandlerForData(false, [], error as? String)
                 print("error in stat - 1")
@@ -109,7 +107,6 @@ class Networking: NSObject {
                 return
             }
             
-            // pick a random page!
             let pageLimit = min(totalPages, 40)
             let randomPage = Int(arc4random_uniform(UInt32(pageLimit))) + 1
             
@@ -172,7 +169,7 @@ class Networking: NSObject {
             }
             
             guard let totalPhotos = (photoDictionary[Constants.FlickrResponseKeys.Pages] as? Int) else {
-                //completionHandleWithPage(false, [], error as? String)
+                completionHandleWithPage(false, [], error as? String)
                 print("error in totalpages - 2 \(String(describing: error as NSError?))")
                 return
             }
@@ -180,8 +177,7 @@ class Networking: NSObject {
             print(totalPhotos)
             
             if totalPhotos > 0 {
-                
-                /* GUARD: Is the "photo" key in photosDictionary? */
+    
                 guard let photosArray = photoDictionary[Constants.FlickrResponseKeys.Photo] as? [[String: AnyObject]] else {
                    completionHandleWithPage(false, [], error as? String)
                     print("error in photoarray - 2")
@@ -204,7 +200,6 @@ class Networking: NSObject {
     func imageData(_ stringURL: String, completionHandlerForImage: @escaping(_ imageData: NSData?, _ error: String?) -> Void) -> URLSessionTask {
         
         let baseURL = NSURL(string: stringURL)!
-        print(baseURL)
         
         let request = NSURLRequest(url: baseURL as URL)
         let session = URLSession.shared
@@ -214,15 +209,13 @@ class Networking: NSObject {
                 print("error in request")
                 
             } else {
-                completionHandlerForImage(data! as NSData, nil)
+                completionHandlerForImage(data as NSData?, nil)
             }
         }
         task.resume()
         
         return task
     }
-    
-    
     
     class func sharedInstance() -> Networking {
         struct Singleton {
