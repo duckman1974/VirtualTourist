@@ -212,8 +212,7 @@ class Networking: NSObject {
                 completionHandlerForImage(data as NSData?, nil)
             }
         }
-        task.resume()
-        
+       task.resume()
         return task
     }
     

@@ -29,6 +29,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
     var annotation: MKAnnotation!
     var region: MKCoordinateRegion!
     var bbox = ""
+    var photoArray = [Photo]()
     
     
     
@@ -44,8 +45,16 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         mapViewPC.addAnnotation(annotation)
         mapViewPC.setRegion(region, animated: true)
         self.mapViewPC.camera.altitude = 50000
+        fetchedResultsController?.delegate = self
+        
+        fetchPhotos()
+        
+        if fetchedResultsController?.fetchedObjects!.count == 0 {
+            photosDownload()
+        }
         
         
+        /*
         if pin.photo.isEmpty {
             print("downloading new photos")
             photosDownload()
@@ -53,6 +62,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         } else {
             self.newCollection.isHidden = false
         }
+ */
     }
     
     override func viewDidLoad() {
@@ -66,12 +76,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         photoCollection.allowsMultipleSelection = true
         newCollection.isHidden = false
         removePhotos.isHidden = true
-        fetchedResultsController?.delegate = self
         
-        do {
-            print("retrieving from coredata")
-            try fetchedResultsController?.performFetch()
-        } catch {}
         
         setupCollectionFlowLayout()
     }
@@ -82,6 +87,21 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: AppDelegate.stack.context, sectionNameKeyPath: nil, cacheName: nil)
         return fetchedResultsController
     }()
+    
+    func fetchPhotos(){
+        
+        if let fc = fetchedResultsController {
+            
+            do {
+                print("retrieving from coredata")
+                try fc.performFetch()
+                
+            } catch {}
+        }
+        for Photo in (fetchedResultsController?.fetchedObjects)! {
+            print(Photo)
+        }
+    }
     
     
     func photosDownload() {
@@ -103,6 +123,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
                         _ = photos.map() {(dictionary: [String:AnyObject]) -> Photo in
                             let photo = Photo(dictionary: dictionary, context: AppDelegate.stack.context)
                             photo.pin = self.pin
+                            //print(photo.pin as AnyObject)
                             AppDelegate.stack.save()
                             return photo
                             }
@@ -183,6 +204,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         
         var photoImage = UIImage(named: "placeHolder")
         let photo = fetchedResultsController?.object(at: indexPath) as! Photo
+        //print(photo.stringURL)
         
         if photo.stringURL == nil || photo.stringURL == "" {
             photoImage = UIImage(named: "placeHolder")
@@ -193,7 +215,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         } else {
             
             DispatchQueue.main.async {
-                cell.statusWheel.isHidden = false
+                cell.statusWheel.hidesWhenStopped = true
                 cell.statusWheel.startAnimating()
             }
             
@@ -208,12 +230,21 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
                 if let data = imageData {
 
                     photoImage = UIImage(data: data as Data)!
-                    AppDelegate.stack.save()
+                    //AppDelegate.stack.save()
                     
                     DispatchQueue.main.async {
                         cell.statusWheel.stopAnimating()
-                        cell.statusWheel.isHidden = true
                         cell.photoImage.image = photoImage
+                    }
+                    
+                    
+                    
+                    
+                    do{
+                        try AppDelegate.stack.context.save()
+                        
+                    }catch{
+                        print("couldn't save data")
                     }
                 }
             }
