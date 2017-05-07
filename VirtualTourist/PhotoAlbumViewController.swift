@@ -50,19 +50,9 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         fetchPhotos()
         
         if fetchedResultsController?.fetchedObjects!.count == 0 {
+            print("download photos")
             photosDownload()
         }
-        
-        
-        /*
-        if pin.photo.isEmpty {
-            print("downloading new photos")
-            photosDownload()
-            
-        } else {
-            self.newCollection.isHidden = false
-        }
- */
     }
     
     override func viewDidLoad() {
@@ -99,7 +89,7 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
             } catch {}
         }
         for Photo in (fetchedResultsController?.fetchedObjects)! {
-            print(Photo)
+            //print(Photo)
         }
     }
     
@@ -208,10 +198,10 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
         
         if photo.stringURL == nil || photo.stringURL == "" {
             photoImage = UIImage(named: "placeHolder")
-            
+        /*
         } else if photo.photo != nil {
             photoImage = UIImage(data: photo.photo! as Data)
-
+        */
         } else {
             
             DispatchQueue.main.async {
@@ -236,7 +226,10 @@ class PhotoAlbumViewController: UIViewController, MKMapViewDelegate, NSFetchedRe
                         cell.statusWheel.stopAnimating()
                         cell.photoImage.image = photoImage
                     }
-                    
+                    /**** DO something here to save the photo to Core Data
+ 
+                    *****/
+                    //photo.photo = UIImagePNGRepresentation(photoImage!)
                     
                     
                     
